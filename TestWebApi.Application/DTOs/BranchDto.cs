@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace TestWebApi.Application.DTOs
 {
-    public record CreateBranchDto(string BranchName,int OrderNo);
+    public record CreateBranchDto(string BranchName,int OrderNo); //Addbranch
 }
