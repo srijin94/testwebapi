@@ -8,6 +8,10 @@ RUN dotnet publish -c Release -o /app
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app .
+
+# Fix here:
+COPY --from=build /app .   # Copy published app from build stage to runtime
+
 ENV ASPNETCORE_URLS=http://+:$PORT
+
 ENTRYPOINT ["dotnet", "TestWebApi.dll"]
