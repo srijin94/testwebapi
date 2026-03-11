@@ -2,22 +2,26 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy the project file(s) and restore dependencies
+# Copy only the project file first (important!)
 COPY *.csproj ./
-RUN dotnet restore
 
-# Copy all files and publish
+# Restore NuGet packages with diagnostic verbosity
+RUN dotnet restore --verbosity diagnostic
+
+# Copy the rest of the source code
 COPY . ./
+
+# Publish the project
 RUN dotnet publish -c Release -o /app/publish
 
 # Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
-# Copy published files from build stage
+# Copy the published output from the build stage
 COPY --from=build /app/publish .
 
-# Set the port environment variable from Render
+# Set the port environment variable so Render knows which port to use
 ENV ASPNETCORE_URLS=http://+:$PORT
 
 # Start the API
