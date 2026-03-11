@@ -1,31 +1,18 @@
-# ------------------------------------
-# Stage 1: Build
-# ------------------------------------
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-
-# Set working directory inside container
 WORKDIR /src
 
-# Copy csproj and restore dependencies (caching)
-COPY *.csproj ./
+# Copy csproj from relative path from repo root
+COPY TestWebApi.API/*.csproj ./
 RUN dotnet restore
 
-# Copy all source code and publish app
-COPY . ./
+# Copy all source code
+COPY TestWebApi.API/. ./
 RUN dotnet publish -c Release -o /app
 
-# ------------------------------------
-# Stage 2: Runtime
-# ------------------------------------
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
-
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-
-# Copy published app from build stage
 COPY --from=build /app .
-
-# Bind to Render's PORT environment variable
 ENV ASPNETCORE_URLS=http://+:$PORT
-
-# Run the app
 ENTRYPOINT ["dotnet", "TestWebApi.dll"]
